@@ -1,16 +1,20 @@
+import { SlashCommandBuilder } from "@discordjs/builders"
 import { Client } from "discord.js"
-import { CommandInterface } from "../interfaces/CommandInterface"
+import { Command } from "../Command"
 
-const ping: CommandInterface = {
+const ping = new Command({
   name: "ping",
   description: "Replies with pong!",
-  // usage: "",
+  usage: "",
   aliases: [],
   enabled: true,
   guildOnly: false,
   ownerOnly: false,
   permissions: [],
-  // args: [],
+  args: [],
+  slashCommand: new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Replies with pong!"),
   run: async (message, interaction) => {
     if (interaction) {
       let client: Client
@@ -26,6 +30,6 @@ const ping: CommandInterface = {
     }
     return "Some error occured."
   },
-}
+})
 
 export default ping
