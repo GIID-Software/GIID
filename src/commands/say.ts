@@ -1,10 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
 import { Command } from "../Command"
 
-const slashCommand = new SlashCommandBuilder()
-  .setName("say")
-  .setDescription("Make the bot say something")
-
 const say = new Command({
   name: "say",
   description: "Make the bot say something",
@@ -14,17 +10,9 @@ const say = new Command({
   guildOnly: false,
   ownerOnly: false,
   permissions: [],
-  args: [
-    {
-      name: "message",
-      description: "The message to say",
-      required: true,
-      type: 3,
-      choices: undefined,
-      autocomplete: undefined,
-    },
-  ],
-  slashCommand: slashCommand,
+  slashCommand: new SlashCommandBuilder()
+    .setName("say")
+    .setDescription("Make the bot say something"),
   run: async (message, interaction) => {
     if (interaction) {
       let text = interaction.options.getString("message")

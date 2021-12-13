@@ -10,14 +10,6 @@ export class Command {
   public readonly guildOnly: boolean
   public readonly ownerOnly: boolean
   public readonly permissions: string[]
-  public readonly args: {
-    type: number
-    name: string
-    description: string
-    required: boolean
-    choices: undefined
-    autocomplete: undefined
-  }[]
   public readonly run: (
     message: Message | null,
     Interaction: CommandInteraction<CacheType> | null
@@ -34,14 +26,7 @@ export class Command {
     guildOnly: boolean
     ownerOnly: boolean
     permissions: string[]
-    args: {
-      type: number
-      name: string
-      description: string
-      required: boolean
-      choices: undefined
-      autocomplete: undefined
-    }[]
+
     slashCommand: SlashCommandBuilder
     run: (
       message: Message | null,
@@ -58,7 +43,6 @@ export class Command {
     this.guildOnly = commandData.guildOnly
     this.ownerOnly = commandData.ownerOnly
     this.permissions = commandData.permissions
-    this.args = commandData.args
     this.run = commandData.run
     this.slashCommand = commandData.slashCommand
   }

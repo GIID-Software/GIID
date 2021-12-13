@@ -11,7 +11,6 @@ const ping = new Command({
   guildOnly: false,
   ownerOnly: false,
   permissions: [],
-  args: [],
   slashCommand: new SlashCommandBuilder()
     .setName("ping")
     .setDescription("Replies with pong!"),
