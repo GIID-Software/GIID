@@ -2,7 +2,7 @@ export const config = {
   // The name of the project
   name: "My Project",
   // The bot token
-  token: "OTAxMDc5MDgwMDkzNTExNjgw.YXKpSQ.SakOpwbwQOmBLOmcrq8854pB_UI",
+  token: "",
   // The bot prefix
   prefix: "!",
   // Full path to dist directory
