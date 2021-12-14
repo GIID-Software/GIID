@@ -1,6 +1,7 @@
 import { Client, Intents } from "discord.js"
 import { config } from "./config.js"
 import { CommandHandler } from "./CommandHandler.js"
+import { Dashboard } from "./dashboard/index.js"
 
 const client = new Client({
   intents: [
@@ -16,7 +17,9 @@ const client = new Client({
 client.on("ready", () => {
   console.log("[INFO] Ready!")
 
-  client.user?.setActivity("bot system", { type: "WATCHING" })
+  Dashboard.start(client)
+
+  client.user?.setActivity("bot system.", { type: "WATCHING" })
 
   CommandHandler.loadAll(client)
 })

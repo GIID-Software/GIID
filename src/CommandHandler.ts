@@ -1,11 +1,16 @@
-import { CacheType, Client, CommandInteraction, Message } from "discord.js"
+import {
+  CacheType,
+  Client,
+  CommandInteraction,
+  Message,
+  MessageEmbed,
+} from "discord.js"
 import { config } from "./config"
 import { readdir, statSync } from "fs"
 import path from "path"
 import { Command } from "./Command"
 import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v9"
-
 export class CommandHandler {
   // #path: string = path.join(config.dir, "commands")
   #name: string
@@ -49,7 +54,22 @@ export class CommandHandler {
           command.#enabled
         ) {
           command.#run(message, null).then((result) => {
-            if (result) message.channel.send(result)
+            if (result) {
+              if (typeof result === "string") {
+                message.reply({
+                  embeds: [
+                    new MessageEmbed()
+                      .setTitle(result)
+                      .setFooter("GIID Software")
+                      .setColor("AQUA"),
+                  ],
+                })
+              } else if (typeof result === "object") {
+                message.reply({
+                  embeds: [result.setFooter("GIID Software").setColor("AQUA")],
+                })
+              }
+            }
           })
         }
         if (command.#aliases) {
@@ -59,7 +79,24 @@ export class CommandHandler {
               command.#enabled
             ) {
               command.#run(message, null).then((result) => {
-                if (result) message.channel.send(result)
+                if (result) {
+                  if (typeof result === "string") {
+                    message.reply({
+                      embeds: [
+                        new MessageEmbed()
+                          .setTitle(result)
+                          .setFooter("GIID Software")
+                          .setColor("AQUA"),
+                      ],
+                    })
+                  } else if (typeof result === "object") {
+                    message.reply({
+                      embeds: [
+                        result.setFooter("GIID Software").setColor("AQUA"),
+                      ],
+                    })
+                  }
+                }
               })
             }
           })
@@ -68,6 +105,8 @@ export class CommandHandler {
     })
 
     client.on("interactionCreate", (interaction) => {
+      if (!interaction.isCommand()) {
+      }
       CommandHandler.commands.forEach((command) => {
         if (command.#guildOnly && !interaction.guild) return
         if (command.#ownerOnly && interaction.user.id !== config.ownerId) return
@@ -76,22 +115,28 @@ export class CommandHandler {
           interaction.commandName === command.#name &&
           command.#enabled
         ) {
-          command.#run(null, interaction).then((result) => {
-            if (result) interaction.reply(result)
-          })
-        }
-        if (command.#aliases) {
-          command.#aliases.forEach((alias) => {
-            if (
-              interaction.isCommand() &&
-              interaction.commandName === alias &&
-              command.#enabled
-            ) {
-              command.#run(null, interaction).then((result) => {
-                if (result) interaction.reply(result)
-              })
-            }
-          })
+          command
+            .#run(null, interaction)
+            .then((result: string | MessageEmbed | null) => {
+              if (result) {
+                if (typeof result === "string") {
+                  interaction.reply({
+                    embeds: [
+                      new MessageEmbed()
+                        .setTitle(result)
+                        .setFooter("GIID Software")
+                        .setColor("AQUA"),
+                    ],
+                  })
+                } else if (typeof result === "object") {
+                  interaction.reply({
+                    embeds: [
+                      result.setFooter("GIID Software").setColor("AQUA"),
+                    ],
+                  })
+                }
+              }
+            })
         }
       })
     })

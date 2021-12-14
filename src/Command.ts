@@ -1,5 +1,10 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
-import { CacheType, CommandInteraction, Message } from "discord.js"
+import {
+  CacheType,
+  CommandInteraction,
+  Message,
+  MessageEmbed,
+} from "discord.js"
 
 export class Command {
   public readonly name: string
@@ -13,7 +18,7 @@ export class Command {
   public readonly run: (
     message: Message | null,
     Interaction: CommandInteraction<CacheType> | null
-  ) => Promise<string | null>
+  ) => Promise<string | MessageEmbed | null>
 
   public slashCommand: SlashCommandBuilder
 
@@ -31,7 +36,7 @@ export class Command {
     run: (
       message: Message | null,
       Interaction: CommandInteraction<CacheType> | null
-    ) => Promise<string | null>
+    ) => Promise<string | MessageEmbed | null>
   }) {
     this.name = commandData.name
     this.description = commandData.description
