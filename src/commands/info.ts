@@ -29,37 +29,59 @@ const info = new Command({
   run: async (message, interaction) => {
     if (interaction) {
       const user = interaction.options.getUser("user_data")
+
       if (user) {
-        interaction.guild?.members
-          .fetch(user.id)
-          .then((member) => {
-            return new MessageEmbed().setTitle(`User Info`).addFields([
-              {
-                name: "ID",
-                value: member.id,
-                inline: true,
-              },
-              {
-                name: "Nickname",
-                value: member.nickname || "None",
-                inline: true,
-              },
-            ])
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+        let avatar = user.avatarURL()
+        let member = interaction.guild?.members.cache.get(user.id)
+        let roles = member?.roles.cache.map((role) => role.id)
+
+        const embed = new MessageEmbed().setTitle("User Info").addFields([
+          {
+            name: "ID",
+            value: user.id,
+            inline: true,
+          },
+          {
+            name: "Nickname Or Username",
+            value: member?.nickname || user.username,
+            inline: true,
+          },
+          {
+            name: "Created At",
+            value: user.createdAt.toLocaleString(),
+            inline: true,
+          },
+          {
+            name: "Joined At",
+            value:
+              interaction.guild?.members.cache
+                .get(user.id)
+                ?.joinedAt?.toLocaleString() || "None",
+            inline: true,
+          },
+          {
+            name: "Roles",
+            value: roles?.map((role) => "<@&" + role + ">").join(" ") || "None",
+            inline: true,
+          },
+        ])
+        if (avatar) {
+          embed.setThumbnail(avatar)
+        }
+        return embed
       } else {
         return "User not found."
       }
-    }
-    if (message) {
+    } else if (message) {
       switch (message.content.split(" ")[1]) {
         case "user":
           const user = message.mentions.users.first()
 
           if (user && message.content.split(" ")[2]?.includes(user.id)) {
             let avatar = user.avatarURL()
+            let member = message.guild?.members.cache.get(user.id)
+            let roles = member?.roles.cache.map((role) => role.id)
+
             const embed = new MessageEmbed().setTitle("User Info").addFields([
               {
                 name: "ID",
@@ -68,9 +90,7 @@ const info = new Command({
               },
               {
                 name: "Nickname Or Username",
-                value:
-                  message.guild?.members.cache.get(user.id)?.nickname ||
-                  user.username,
+                value: member?.nickname || user.username,
                 inline: true,
               },
               {
@@ -84,6 +104,12 @@ const info = new Command({
                   message.guild?.members.cache
                     .get(user.id)
                     ?.joinedAt?.toLocaleString() || "None",
+                inline: true,
+              },
+              {
+                name: "Roles",
+                value:
+                  roles?.map((role) => "<@&" + role + ">").join(" ") || "None",
                 inline: true,
               },
             ])
