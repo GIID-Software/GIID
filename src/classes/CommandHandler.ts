@@ -5,7 +5,7 @@ import {
   Message,
   MessageEmbed,
 } from "discord.js"
-import { config } from "./config"
+import { config } from "../config"
 import { readdir, statSync } from "fs"
 import path from "path"
 import { Command } from "./Command"
@@ -30,6 +30,7 @@ export class CommandHandler {
   private constructor(file: string) {
     const command: Command = require(file).default
 
+
     this.#name = command.name
     this.#run = command.run
     this.#aliases = command.aliases
@@ -46,11 +47,12 @@ export class CommandHandler {
 
   static registerEventListeners(client: Client) {
     client.on("messageCreate", (message: Message) => {
+      if (message.author.bot) return
       CommandHandler.commands.forEach((command) => {
         if (command.#guildOnly && !message.guild) return
         if (command.#ownerOnly && message.author.id !== config.ownerId) return
         if (
-          message.content.startsWith(config.prefix + command.#name) &&
+          message.content.split(/ /g)[0] == config.prefix + command.#name &&
           command.#enabled
         ) {
           command.#run(message, null).then((result) => {
@@ -75,7 +77,7 @@ export class CommandHandler {
         if (command.#aliases) {
           command.#aliases.forEach((alias) => {
             if (
-              message.content.startsWith(config.prefix + alias) &&
+              message.content.split(/ /g)[0] == config.prefix + alias &&
               command.#enabled
             ) {
               command.#run(message, null).then((result) => {
@@ -105,40 +107,40 @@ export class CommandHandler {
     })
 
     client.on("interactionCreate", (interaction) => {
-      if (!interaction.isCommand()) {
-      }
-      CommandHandler.commands.forEach((command) => {
-        if (command.#guildOnly && !interaction.guild) return
-        if (command.#ownerOnly && interaction.user.id !== config.ownerId) return
-        if (
-          interaction.isCommand() &&
-          interaction.commandName === command.#name &&
-          command.#enabled
-        ) {
-          command
-            .#run(null, interaction)
-            .then((result: string | MessageEmbed | null) => {
-              if (result) {
-                if (typeof result === "string") {
-                  interaction.reply({
-                    embeds: [
-                      new MessageEmbed()
-                        .setTitle(result)
-                        .setFooter("GIID Software")
-                        .setColor("AQUA"),
-                    ],
-                  })
-                } else if (typeof result === "object") {
-                  interaction.reply({
-                    embeds: [
-                      result.setFooter("GIID Software").setColor("AQUA"),
-                    ],
-                  })
+      if (interaction.isCommand()) {
+        CommandHandler.commands.forEach((command) => {
+          if (command.#guildOnly && !interaction.guild) return
+          if (command.#ownerOnly && interaction.user.id !== config.ownerId) return
+          if (
+            interaction.isCommand() &&
+            interaction.commandName === command.#name &&
+            command.#enabled
+          ) {
+            command
+              .#run(null, interaction)
+              .then((result: string | MessageEmbed | null) => {
+                if (result) {
+                  if (typeof result === "string") {
+                    interaction.reply({
+                      embeds: [
+                        new MessageEmbed()
+                          .setTitle(result)
+                          .setFooter("GIID Software")
+                          .setColor("AQUA"),
+                      ],
+                    })
+                  } else if (typeof result === "object") {
+                    interaction.reply({
+                      embeds: [
+                        result.setFooter("GIID Software").setColor("AQUA"),
+                      ],
+                    })
+                  }
                 }
-              }
-            })
-        }
-      })
+              })
+          }
+        })
+      }
     })
   }
 
@@ -165,10 +167,13 @@ export class CommandHandler {
     })
   }
 
-  static async load(file: string): Promise<CommandHandler> {
-    const command = new this(file)
-    CommandHandler.commands.push(command)
-    return command
+  static async load(file: string): Promise<CommandHandler | undefined> {
+    if (require(file).default.enabled) {
+      const command = new this(file)
+      CommandHandler.commands.push(command)
+      return command
+    }
+    return undefined
   }
 
   private static async readDir(dir: string, client: Client): Promise<void> {

@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { Client } from 'discord.js'
+import { GuildMember } from 'discord.js'
 import { Command } from '../classes/Command'
 
 const ping = new Command({
-  name: 'ping',
+  name: 'simleave',
   description: 'Replies with pong!',
   usage: '',
   aliases: [],
@@ -12,20 +12,22 @@ const ping = new Command({
   ownerOnly: false,
   permissions: [],
   slashCommand: new SlashCommandBuilder()
-    .setName('ping')
+    .setName('simleave')
     .setDescription('Replies with pong!'),
   run: async (message, interaction) => {
     if (interaction) {
-      let client: Client
-      client = interaction.client
-      let ms = client.ws.ping
-      return 'Pong! ' + Math.round(ms) + 'ms'
+      let member = interaction.member as GuildMember
+
+      member.client.emit('guildMemberRemove', member)
+
+      return 'Leave was emited'
     }
     if (message) {
-      let client: Client
-      client = message.client
-      let ms = client.ws.ping
-      return 'Pong! ' + Math.round(ms) + 'ms'
+      let member = message.member
+
+      member?.client.emit('guildMemberRemove', member)
+
+      return 'Leave was emited'
     }
     return 'An error occured.'
   }

@@ -18,7 +18,7 @@ export class Command {
   public readonly run: (
     message: Message | null,
     Interaction: CommandInteraction<CacheType> | null
-  ) => Promise<string | MessageEmbed | null>
+  ) => Promise<string | MessageEmbed | null | undefined>
 
   public slashCommand: SlashCommandBuilder
 
@@ -36,7 +36,7 @@ export class Command {
     run: (
       message: Message | null,
       Interaction: CommandInteraction<CacheType> | null
-    ) => Promise<string | MessageEmbed | null>
+    ) => Promise<string | MessageEmbed | null | undefined>
   }) {
     this.name = commandData.name
     this.description = commandData.description
